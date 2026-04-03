@@ -6,19 +6,75 @@
   <title>VERDIS-GHG</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Noto Sans KR',-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#052e16,#064e3b,#065f46);color:#fff}
-    .card{text-align:center;padding:48px 40px;background:rgba(255,255,255,.06);border-radius:20px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);max-width:420px;width:90%}
+    body{
+      font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,#052e16,#064e3b,#065f46);
+      color:#fff;
+    }
+    .card{
+      text-align:center;
+      padding:48px 40px;
+      background:rgba(255,255,255,.06);
+      border-radius:20px;
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,.1);
+      max-width:460px;
+      width:92%;
+      box-shadow:0 20px 60px rgba(0,0,0,.25);
+    }
     .logo{font-size:48px;margin-bottom:16px}
     h1{font-size:22px;font-weight:700;margin-bottom:6px}
-    .sub{font-size:13px;opacity:.7;margin-bottom:32px}
-    .spinner{width:36px;height:36px;margin:0 auto 20px;border:3px solid rgba(255,255,255,.15);border-top:3px solid #10b981;border-radius:50%;animation:spin .8s linear infinite}
+    .sub{font-size:13px;opacity:.75;margin-bottom:32px}
+    .spinner{
+      width:36px;height:36px;
+      margin:0 auto 20px;
+      border:3px solid rgba(255,255,255,.15);
+      border-top:3px solid #10b981;
+      border-radius:50%;
+      animation:spin .8s linear infinite
+    }
     @keyframes spin{to{transform:rotate(360deg)}}
-    .msg{font-size:14px;opacity:.9}
-    .link{display:inline-block;margin-top:24px;padding:10px 28px;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.4);border-radius:10px;color:#10b981;text-decoration:none;font-size:13px;font-weight:600;transition:.2s}
+    .msg{font-size:14px;opacity:.95;line-height:1.6}
+    .link{
+      display:inline-block;
+      margin-top:24px;
+      padding:10px 28px;
+      background:rgba(16,185,129,.2);
+      border:1px solid rgba(16,185,129,.4);
+      border-radius:10px;
+      color:#d1fae5;
+      text-decoration:none;
+      font-size:13px;
+      font-weight:600;
+      transition:.2s
+    }
     .link:hover{background:rgba(16,185,129,.35)}
-    .footer{margin-top:32px;font-size:10px;opacity:.4}
-
-    /* iframe 전체화면 */
+    .footer{margin-top:32px;font-size:10px;opacity:.45}
+    .error{
+      display:none;
+      margin-top:18px;
+      padding:14px 16px;
+      border-radius:12px;
+      background:rgba(220,38,38,.14);
+      border:1px solid rgba(248,113,113,.35);
+      font-size:13px;
+      line-height:1.65;
+      text-align:left;
+    }
+    .code{
+      display:block;
+      margin-top:8px;
+      padding:8px 10px;
+      background:rgba(0,0,0,.18);
+      border-radius:8px;
+      font-family:Consolas,monospace;
+      font-size:12px;
+      word-break:break-all;
+    }
     #app-frame{
       display:none;
       position:fixed;
@@ -26,32 +82,64 @@
       width:100%;height:100%;
       border:none;
       z-index:9999;
+      background:#fff;
     }
   </style>
 </head>
 <body>
-  <!-- 로딩 카드 -->
   <div class="card" id="loading-card">
     <div class="logo">🏭</div>
     <h1>VERDIS-GHG</h1>
     <div class="sub">GHG Accounting & Verification · ISO 14064-1</div>
-    <div class="spinner"></div>
-    <div class="msg">플랫폼에 접속하고 있습니다...</div>
+
+    <div class="spinner" id="spinner"></div>
+    <div class="msg" id="status-msg">플랫폼에 접속하고 있습니다...</div>
+
+    <div class="error" id="error-box">
+      앱을 iframe(프레임 삽입)으로 불러오지 못했습니다.<br>
+      Apps Script `doGet()` 반환부에서 아래 설정이 필요할 수 있습니다.
+      <span class="code">.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)</span>
+      또, Apps Script 재배포(deploy, 새 버전 배포)가 안 되었으면 기존 설정이 계속 유지됩니다.
+    </div>
+
+    <a
+      class="link"
+      id="direct-link"
+      href="https://script.google.com/macros/s/AKfycbwuA_jA_R1SFMF9oZiQK9sZqQ1cVcVma0u3x1sv6_qS/exec?app=ghg">
+      원본 앱 직접 열기
+    </a>
+
     <div class="footer">Powered by INTERWELL & Plan A Plus</div>
   </div>
 
-  <!-- iframe -->
   <iframe
     id="app-frame"
-    src="https://script.google.com/a/macros/interwell.co.kr/s/AKfycbxS-R1Q-eWeOh8XtIacCz6O8ZbshozyKdTOWtt9u267rwOsDc9RcGx-_UfX6fHP6UE0Cg/exec?app=ghg"
+    src="https://script.google.com/macros/s/AKfycbwuA_jA_R1SFMF9oZiQK9sZqQ1cVcVma0u3x1sv6_qS/exec?app=ghg"
+    referrerpolicy="strict-origin-when-cross-origin"
     allowfullscreen
     allow="clipboard-read; clipboard-write">
   </iframe>
 
   <script>
-    var frame = document.getElementById('app-frame');
-    frame.addEventListener('load', function(){
-      document.getElementById('loading-card').style.display = 'none';
+    const frame = document.getElementById('app-frame');
+    const loadingCard = document.getElementById('loading-card');
+    const spinner = document.getElementById('spinner');
+    const statusMsg = document.getElementById('status-msg');
+    const errorBox = document.getElementById('error-box');
+
+    let loaded = false;
+
+    const failTimer = setTimeout(() => {
+      if (loaded) return;
+      spinner.style.display = 'none';
+      statusMsg.textContent = '앱 로딩이 지연되거나 차단되었습니다.';
+      errorBox.style.display = 'block';
+    }, 10000);
+
+    frame.addEventListener('load', function() {
+      loaded = true;
+      clearTimeout(failTimer);
+      loadingCard.style.display = 'none';
       frame.style.display = 'block';
     });
   </script>

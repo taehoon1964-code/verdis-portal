@@ -1,71 +1,27 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>VERDIS - Cultivating Sustainable Value</title>
+  <title>VERDIS Platform</title>
+  <meta http-equiv="refresh" content="0;url=https://script.google.com/macros/s/AKfycbwuA_jA_R1SFMF9oZiQK9sZqQ1cVcVma0u3x1sv6_qS/dev">
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Noto Sans KR', -apple-system, sans-serif;
-      min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: #fff; padding: 20px;
-    }
-    .container { max-width: 680px; width: 100%; text-align: center; }
-    .brand { font-size: 48px; margin-bottom: 8px; }
-    h1 { font-size: 28px; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px; }
-    .tagline { font-size: 14px; opacity: 0.7; margin-bottom: 8px; }
-    .powered { font-size: 11px; opacity: 0.4; margin-bottom: 36px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
-    .card {
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 14px; padding: 24px 16px; text-decoration: none; color: #fff;
-      transition: all 0.25s; cursor: pointer;
-    }
-    .card:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); border-color: rgba(16,185,129,0.4); }
-    .card .icon { font-size: 32px; margin-bottom: 8px; }
-    .card .name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-    .card .desc { font-size: 11px; opacity: 0.6; line-height: 1.5; }
-    .full { grid-column: 1 / -1; }
-    .footer { font-size: 10px; opacity: 0.3; margin-top: 24px; }
-    @media (max-width: 500px) { .grid { grid-template-columns: 1fr; } }
+    body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;
+         background:linear-gradient(135deg,#0f172a,#1e3a5f);font-family:'Segoe UI',sans-serif;color:#fff}
+    .card{text-align:center;padding:48px;border-radius:20px;background:rgba(255,255,255,.06);
+          backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+    .spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.15);
+             border-top-color:#22d3ee;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="brand">🌿</div>
-    <h1>VERDIS</h1>
-    <div class="tagline">Cultivating Sustainable Value</div>
-    <div class="powered">Powered by INTERWELL & Plan A Plus</div>
-    <div class="grid">
-      <a class="card" href="/ghg/">
-        <div class="icon">🏭</div>
-        <div class="name">VERDIS-GHG</div>
-        <div class="desc">온실가스 회계 & 검증<br>ISO 14064-1 · GHG Protocol</div>
-      </a>
-      <a class="card" href="/esg/">
-        <div class="icon">📊</div>
-        <div class="name">VERDIS-ESG</div>
-        <div class="desc">ESG 경영공시<br>지속가능경영 보고</div>
-      </a>
-      <a class="card" href="/kssb/">
-        <div class="icon">📋</div>
-        <div class="name">VERDIS-KSSB</div>
-        <div class="desc">한국 지속가능성 공시<br>KSSB 기준 대응</div>
-      </a>
-      <a class="card" href="/esrs/">
-        <div class="icon">📑</div>
-        <div class="name">VERDIS-ESRS</div>
-        <div class="desc">유럽 지속가능성 보고<br>CSRD / ESRS 대응</div>
-      </a>
-      <a class="card full" href="/nzc/">
-        <div class="icon">🌍</div>
-        <div class="name">Net-Zero Compass</div>
-        <div class="desc">PCAF 2025 Edition · Financed Emissions · 금융기관 탄소회계</div>
-      </a>
-    </div>
-    <div class="footer">© 2025 INTERWELL & Plan A Plus. All rights reserved.</div>
+  <div class="card">
+    <div class="spinner"></div>
+    <h2>🌿 VERDIS Platform</h2>
+    <p>플랫폼에 접속 중입니다...</p>
   </div>
+  <script>
+    window.location.replace("https://script.google.com/macros/s/AKfycbwuA_jA_R1SFMF9oZiQK9sZqQ1cVcVma0u3x1sv6_qS/dev");
+  </script>
 </body>
 </html>

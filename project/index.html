@@ -1,1 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>VERDIS Platform</title>
+  <style>
+    body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;
+         background:linear-gradient(135deg,#0f172a,#1e3a5f);font-family:'Segoe UI',sans-serif;color:#fff}
+    .card{text-align:center;padding:48px;border-radius:20px;background:rgba(255,255,255,.06);
+          backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+    .spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.15);
+             border-top-color:#22d3ee;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
+    /* iframe 전체화면 */
+    #app-frame{
+      display:none;
+      position:fixed;
+      top:0;left:0;
+      width:100%;height:100%;
+      border:none;
+      z-index:9999;
+    }
+  </style>
+</head>
+<body>
+  <!-- 로딩 카드 -->
+  <div class="card" id="loading-card">
+    <div class="spinner"></div>
+    <h2>🌿 VERDIS Platform</h2>
+    <p>플랫폼에 접속 중입니다...</p>
+  </div>
+
+  <!-- iframe -->
+  <iframe
+    id="app-frame"
+    src="https://script.google.com/a/macros/interwell.co.kr/s/AKfycbx3DFz9tkytwy4hPb3iAN3OOBgXveBA9BM2Vv0x5FtIhGZm_r4ifxSeMdzJSPsxQ48BGQ/exec"
+    allowfullscreen
+    allow="clipboard-read; clipboard-write">
+  </iframe>
+
+  <script>
+    var frame = document.getElementById('app-frame');
+    frame.addEventListener('load', function(){
+      document.getElementById('loading-card').style.display = 'none';
+      frame.style.display = 'block';
+    });
+  </script>
+</body>
+</html>

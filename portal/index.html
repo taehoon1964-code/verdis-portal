@@ -3,16 +3,36 @@
 <head>
   <meta charset="utf-8">
   <title>VERDIS Platform</title>
+
+  <!-- iframe 허용 정책 -->
+  <meta http-equiv="Content-Security-Policy" content="frame-ancestors *;">
+
   <style>
-    body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;
-         background:linear-gradient(135deg,#0f172a,#1e3a5f);font-family:'Segoe UI',sans-serif;color:#fff}
-    .card{text-align:center;padding:48px;border-radius:20px;background:rgba(255,255,255,.06);
-          backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
-    .spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.15);
-             border-top-color:#22d3ee;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
+    body{
+      margin:0;height:100vh;
+      display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,#0f172a,#1e3a5f);
+      font-family:'Segoe UI',sans-serif;color:#fff
+    }
+
+    .card{
+      text-align:center;padding:48px;border-radius:20px;
+      background:rgba(255,255,255,.06);
+      backdrop-filter:blur(12px);
+      box-shadow:0 8px 32px rgba(0,0,0,.3)
+    }
+
+    .spinner{
+      width:48px;height:48px;
+      border:4px solid rgba(255,255,255,.15);
+      border-top-color:#22d3ee;
+      border-radius:50%;
+      animation:spin .8s linear infinite;
+      margin:0 auto 20px
+    }
+
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* iframe 전체화면 */
     #app-frame{
       display:none;
       position:fixed;
@@ -23,28 +43,40 @@
     }
   </style>
 </head>
+
 <body>
-  <!-- 로딩 카드 -->
+
+  <!-- 로딩 -->
   <div class="card" id="loading-card">
     <div class="spinner"></div>
     <h2>🌿 VERDIS Platform</h2>
     <p>플랫폼에 접속 중입니다...</p>
   </div>
 
-  <!-- iframe -->
+  <!-- 실제 앱 -->
   <iframe
     id="app-frame"
-    src="https://script.google.com/macros/s/AKfycbzYc48hvdi2GBFmBjfyehUzxtad8Fl7lon8-gVZBmGoqY47U0VsiT8Rc6rRyYlKEwfFOQ/exec"
-    allowfullscreen
-    allow="clipboard-read; clipboard-write">
+    src="https://script.google.com/a/macros/interwell.co.kr/s/AKfycbw4YufT_72fXNnuFAoufZxPNZ-bs61EXiEjsFCv0E0/exec"
+    allow="clipboard-read; clipboard-write"
+    allowfullscreen>
   </iframe>
 
   <script>
-    var frame = document.getElementById('app-frame');
-    frame.addEventListener('load', function(){
+    const frame = document.getElementById('app-frame');
+
+    frame.onload = function () {
       document.getElementById('loading-card').style.display = 'none';
       frame.style.display = 'block';
-    });
+    };
+
+    // 10초 이상 로딩 시 fallback
+    setTimeout(() => {
+      if (frame.style.display !== 'block') {
+        document.getElementById('loading-card').innerHTML =
+          '<h3>직접 열기</h3><p><a href="'+frame.src+'" target="_blank" style="color:#22d3ee">클릭하여 접속</a></p>';
+      }
+    }, 10000);
   </script>
+
 </body>
 </html>

@@ -149,34 +149,7 @@
         // 탭 제목 업데이트
         document.title = PAGE_TITLES[navPage] || e.data.title || 'VERDIS-PCF';
 
-        // ★ iframe 완전 교체 — 기존 iframe 제거 후 새로 생성하여 확실히 로드
-        var newSrc = e.data.url || (APPS_SCRIPT_URL + '?page=' + navPage + '&embed=1' + (navQuery ? '&' + navQuery : ''));
-        var newIframe = document.createElement('iframe');
-        newIframe.id = 'app';
-        newIframe.allowFullscreen = true;
-        newIframe.setAttribute('allow', 'clipboard-read; clipboard-write');
-        newIframe.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;border:none;z-index:1;';
-        newIframe.addEventListener('load', function () {
-          var ld = document.getElementById('loading');
-          if (ld) { ld.classList.add('fade'); setTimeout(function () { if (ld.parentNode) ld.remove(); }, 500); }
-        });
-        newIframe.src = newSrc;
-        iframe.replaceWith(newIframe);
-        iframe = newIframe;
-
-        // 로딩 스피너 표시
-        var loader = document.getElementById('loading');
-        if (!loader) {
-          loader = document.createElement('div');
-          loader.id = 'loading';
-          loader.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10;display:flex;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(135deg,#064e3b 0%,#0f766e 40%,#059669 100%);color:white;font-family:Inter,system-ui,sans-serif;transition:opacity 0.4s;';
-          loader.innerHTML = '<div class="spinner"></div><p style="margin-top:16px;font-size:14px;color:rgba(255,255,255,0.7)">페이지 이동 중...</p>';
-          document.body.appendChild(loader);
-        } else {
-          loader.classList.remove('fade');
-          loader.style.display = '';
-          loader.style.opacity = '';
-        }
+        // URL 바만 업데이트 — iframe은 건드리지 않음 (이미 로드된 상태)
       });
 
       // ===== 브라우저 뒤로가기/앞으로가기 처리 =====

@@ -29,7 +29,14 @@
   </div>
   <iframe id="app" allowfullscreen allow="clipboard-read; clipboard-write"></iframe>
   <script>
-    var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzCRDYYkb74lJ7kbuYjJ0qrH25dG36PtmvWLdZpzJw4uX-L4oB9kph3LwvrBbwnDv8O/exec';
+    // Deployment ID. Apps Script actually serves the SAME deployment under
+    // two URL shapes depending on the viewer's Google account:
+    //   - public:           https://script.google.com/macros/s/<ID>/exec
+    //   - workspace-domain: https://script.google.com/a/<domain>/macros/s/<ID>/exec
+    // ScriptApp.getService().getUrl() returns whichever the current viewer
+    // resolved to, so we accept either form by matching only the deploy ID.
+    var DEPLOY_ID = 'AKfycbzCRDYYkb74lJ7kbuYjJ0qrH25dG36PtmvWLdZpzJw4uX-L4oB9kph3LwvrBbwnDv8O';
+    var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/' + DEPLOY_ID + '/exec';
     var iframe = document.getElementById('app');
     var loading = document.getElementById('loading');
 
@@ -60,9 +67,11 @@
     window.addEventListener('message', function (e) {
       var d = e && e.data;
       if (!d || d.type !== 'pcf-nav' || typeof d.url !== 'string') return;
-      // Restrict to our own Apps Script deploy URL — don't follow
-      // arbitrary navigation requests.
-      if (d.url.indexOf(APPS_SCRIPT_URL) !== 0) return;
+      // Accept either URL shape: must be script.google.com AND carry
+      // our deployment ID. (Strict prefix-match would reject the
+      // /a/<workspace-domain>/ form Google serves to logged-in users.)
+      if (!/^https:\/\/script\.google\.com\//.test(d.url)) return;
+      if (d.url.indexOf(DEPLOY_ID) < 0) return;
       showLoading();
       iframe.src = d.url;
     });

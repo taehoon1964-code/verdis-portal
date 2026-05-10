@@ -31,7 +31,10 @@
   <script>
     var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzCRDYYkb74lJ7kbuYjJ0qrH25dG36PtmvWLdZpzJw4uX-L4oB9kph3LwvrBbwnDv8O/exec';
     var iframe = document.getElementById('app');
-    iframe.src = APPS_SCRIPT_URL + '?page=home';
+    // ?embed=1 makes the Apps Script templates render with <base target="_self">
+    // so internal navigation stays inside this iframe — the address bar
+    // remains verdis.co.kr/pcf/ throughout the user's session.
+    iframe.src = APPS_SCRIPT_URL + '?page=home&embed=1';
     iframe.addEventListener('load', function () {
       var ld = document.getElementById('loading');
       if (ld) { ld.classList.add('done'); setTimeout(function(){ ld.remove(); }, 600); }

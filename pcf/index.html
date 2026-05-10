@@ -31,13 +31,40 @@
   <script>
     var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzCRDYYkb74lJ7kbuYjJ0qrH25dG36PtmvWLdZpzJw4uX-L4oB9kph3LwvrBbwnDv8O/exec';
     var iframe = document.getElementById('app');
+    var loading = document.getElementById('loading');
+
     // ?embed=1 makes the Apps Script templates render with <base target="_self">
     // so internal navigation stays inside this iframe — the address bar
     // remains verdis.co.kr/pcf/ throughout the user's session.
     iframe.src = APPS_SCRIPT_URL + '?page=home&embed=1';
-    iframe.addEventListener('load', function () {
-      var ld = document.getElementById('loading');
-      if (ld) { ld.classList.add('done'); setTimeout(function(){ ld.remove(); }, 600); }
+
+    function showLoading() {
+      if (!loading) return;
+      loading.style.display = '';
+      loading.classList.remove('done');
+    }
+    function hideLoading() {
+      if (!loading) return;
+      loading.classList.add('done');
+      setTimeout(function () { loading.style.display = 'none'; }, 600);
+    }
+    iframe.addEventListener('load', hideLoading);
+
+    /**
+     * Internal navigation inside the iframe asks us (the wrapper) to
+     * update iframe.src, because doing window.location.href on the
+     * innermost googleusercontent.com frame produces a blank-page
+     * cross-origin redirect chain. Posting from the iframe and
+     * reloading the entire chain from here renders cleanly every time.
+     */
+    window.addEventListener('message', function (e) {
+      var d = e && e.data;
+      if (!d || d.type !== 'pcf-nav' || typeof d.url !== 'string') return;
+      // Restrict to our own Apps Script deploy URL — don't follow
+      // arbitrary navigation requests.
+      if (d.url.indexOf(APPS_SCRIPT_URL) !== 0) return;
+      showLoading();
+      iframe.src = d.url;
     });
   </script>
 </body>

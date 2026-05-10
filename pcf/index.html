@@ -1,50 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
   <meta charset="utf-8">
-  <title>VERDIS-PCF</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VERDIS-PCF — 제품 탄소발자국 플랫폼</title>
+  <meta name="description" content="ISO 14067 기반 제품단위 온실가스 배출량(PCF) 산정 플랫폼. LCA, CBAM, DPP, PEF 대응.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2'><path d='M12 2L2 7l10 5 10-5-10-5z'/><path d='M2 17l10 5 10-5'/><path d='M2 12l10 5 10-5'/></svg>">
   <style>
-    body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;
-         background:linear-gradient(135deg,#0f172a,#1e3a5f);font-family:'Segoe UI',sans-serif;color:#fff}
-    .card{text-align:center;padding:48px;border-radius:20px;background:rgba(255,255,255,.06);
-          backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
-    .spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.15);
-             border-top-color:#22d3ee;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    /* iframe 전체화면 */
-    #app-frame{
-      display:none;
-      position:fixed;
-      top:0;left:0;
-      width:100%;height:100%;
-      border:none;
-      z-index:9999;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #064e3b; }
+    iframe { width: 100%; height: 100%; border: none; display: block; }
+    #loading {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
+      background: linear-gradient(135deg, #064e3b 0%, #0f766e 40%, #059669 100%);
+      color: white; font-family: 'Inter', system-ui, sans-serif; transition: opacity 0.4s;
     }
+    #loading.fade { opacity: 0; pointer-events: none; }
+    .spinner {
+      width: 36px; height: 36px; border: 4px solid rgba(255,255,255,0.2);
+      border-top-color: #34d399; border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading p { margin-top: 16px; font-size: 14px; color: rgba(255,255,255,0.7); }
   </style>
 </head>
 <body>
-  <!-- 로딩 카드 -->
-  <div class="card" id="loading-card">
+  <div id="loading">
     <div class="spinner"></div>
-    <h2>🧭 VERDIS-PCF</h2>
-    <p>잠시만 기다려주세요...</p>
+    <p>VERDIS-PCF 로딩 중...</p>
   </div>
-
-  <!-- iframe -->
-  <iframe
-    id="app-frame"
-    src="https://script.google.com/macros/s/AKfycbxJUm-Sb5xXf5TjcT0fZhHe13TiAIeZN3SS0Ut4rlPkNLLv90ryhnp-kL32QkTFUo8O/exec"
-    allowfullscreen
-    allow="clipboard-read; clipboard-write">
-  </iframe>
+  <iframe id="app" allowfullscreen allow="clipboard-read; clipboard-write"></iframe>
 
   <script>
-    var frame = document.getElementById('app-frame');
-    frame.addEventListener('load', function(){
-      document.getElementById('loading-card').style.display = 'none';
-      frame.style.display = 'block';
-    });
+    (function () {
+      'use strict';
+
+      // ===== 설정 =====
+      // 고정 URL — 기존 verdis.co.kr/pcf 에서 사용 중인 것과 동일
+      var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJUm-Sb5xXf5TjcT0fZhHe13TiAIeZN3SS0Ut4rlPkNLLv90ryhnp-kL32QkTFUo8O/exec';
+      var BASE_PATH = '/pcf';  // GitHub Pages 기본 경로
+
+      // ===== 경로 ↔ 페이지 매핑 =====
+      var PATH_TO_PAGE = {
+        '':            'home',
+        '/':           'home',
+        '/dashboard':  'studies',
+        '/guide':      'guide',
+        '/login':      'login',
+        '/signup':     'signup',
+        '/admin':      'admin',
+        '/new':        'study-new',
+        '/study':      'study'
+      };
+
+      var PAGE_TO_PATH = {
+        'home':       '/',
+        'studies':    '/dashboard',
+        'guide':      '/guide',
+        'login':      '/login',
+        'signup':     '/signup',
+        'admin':      '/admin',
+        'study-new':  '/new',
+        'study':      '/study'
+      };
+
+      var PAGE_TITLES = {
+        'home':       'VERDIS-PCF — 제품 탄소발자국 플랫폼',
+        'studies':    '대시보드 — VERDIS-PCF',
+        'guide':      '가이드 — VERDIS-PCF',
+        'login':      '로그인 — VERDIS-PCF',
+        'signup':     '가입 — VERDIS-PCF',
+        'admin':      '관리자 — VERDIS-PCF',
+        'study-new':  '새 스터디 — VERDIS-PCF',
+        'study':      '스터디 — VERDIS-PCF'
+      };
+
+      // ===== 404.html에서 리다이렉트된 경우 원래 경로 복원 =====
+      var redirect = sessionStorage.getItem('pcf_redirect');
+      if (redirect) {
+        sessionStorage.removeItem('pcf_redirect');
+        // 원래 경로로 pushState
+        history.replaceState(null, '', redirect);
+      }
+
+      // ===== 현재 URL에서 페이지 추출 =====
+      var pathname = location.pathname.replace(BASE_PATH, '').replace(/\/$/, '') || '/';
+      var page = PATH_TO_PAGE[pathname] || 'home';
+      var search = location.search || '';
+      var extraParams = new URLSearchParams(search);
+      // study 페이지는 id 파라미터 전달
+      var iframeSrc = APPS_SCRIPT_URL + '?page=' + page + '&embed=1';
+      extraParams.forEach(function (val, key) {
+        if (key !== 'page' && key !== 'embed') {
+          iframeSrc += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(val);
+        }
+      });
+
+      var iframe = document.getElementById('app');
+      iframe.src = iframeSrc;
+
+      // 로딩 스피너 제거
+      iframe.addEventListener('load', function () {
+        var loader = document.getElementById('loading');
+        if (loader) {
+          loader.classList.add('fade');
+          setTimeout(function () { loader.remove(); }, 500);
+        }
+      });
+
+      // ===== iframe에서 네비게이션 이벤트 수신 =====
+      window.addEventListener('message', function (e) {
+        if (!e.data || e.data.type !== 'pcf-navigate') return;
+
+        var navPage = e.data.page || 'home';
+        var navQuery = e.data.query || '';
+        var newPath = BASE_PATH + (PAGE_TO_PATH[navPage] || '/' + navPage);
+
+        // study 페이지는 query에 id 포함
+        var qs = '';
+        if (navQuery) {
+          // navQuery: "id=5" 같은 형태
+          qs = '?' + navQuery;
+        }
+
+        // URL 바 업데이트 (페이지 리로드 없이)
+        var newUrl = newPath + qs;
+        if (location.pathname + location.search !== newUrl) {
+          history.pushState({ page: navPage, query: navQuery }, '', newUrl);
+        }
+
+        // 탭 제목 업데이트
+        document.title = PAGE_TITLES[navPage] || e.data.title || 'VERDIS-PCF';
+      });
+
+      // ===== 브라우저 뒤로가기/앞으로가기 처리 =====
+      window.addEventListener('popstate', function (e) {
+        var path = location.pathname.replace(BASE_PATH, '').replace(/\/$/, '') || '/';
+        var pg = PATH_TO_PAGE[path] || 'home';
+        var src = APPS_SCRIPT_URL + '?page=' + pg + '&embed=1' + location.search.replace('?', '&');
+        iframe.src = src;
+        document.title = PAGE_TITLES[pg] || 'VERDIS-PCF';
+      });
+
+    })();
   </script>
 </body>
 </html>

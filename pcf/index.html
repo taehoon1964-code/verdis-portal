@@ -135,14 +135,12 @@
         var navQuery = e.data.query || '';
         var newPath = BASE_PATH + (PAGE_TO_PATH[navPage] || '/' + navPage);
 
-        // study 페이지는 query에 id 포함
         var qs = '';
         if (navQuery) {
-          // navQuery: "id=5" 같은 형태
           qs = '?' + navQuery;
         }
 
-        // URL 바 업데이트 (페이지 리로드 없이)
+        // URL 바 업데이트
         var newUrl = newPath + qs;
         if (location.pathname + location.search !== newUrl) {
           history.pushState({ page: navPage, query: navQuery }, '', newUrl);
@@ -150,6 +148,22 @@
 
         // 탭 제목 업데이트
         document.title = PAGE_TITLES[navPage] || e.data.title || 'VERDIS-PCF';
+
+        // ★ iframe src 교체 — 새 페이지를 제대로 로드
+        var newSrc = e.data.url || (APPS_SCRIPT_URL + '?page=' + navPage + '&embed=1' + (navQuery ? '&' + navQuery : ''));
+        iframe.src = newSrc;
+
+        // 로딩 표시
+        var loader = document.getElementById('loading');
+        if (!loader) {
+          loader = document.createElement('div');
+          loader.id = 'loading';
+          loader.innerHTML = '<div class="spinner"></div><p>페이지 이동 중...</p>';
+          document.body.appendChild(loader);
+        } else {
+          loader.classList.remove('fade');
+          loader.style.display = '';
+        }
       });
 
       // ===== 브라우저 뒤로가기/앞으로가기 처리 =====

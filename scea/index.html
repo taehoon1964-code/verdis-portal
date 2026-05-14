@@ -1,1 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VERDIS-SCEA — 공급망 ESG평가 플랫폼</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    iframe { width: 100%; height: 100%; border: none; display: block; }
+    #loading {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
+      background: linear-gradient(135deg, #064e3b 0%, #0f766e 40%, #059669 100%);
+      color: white; font-family: system-ui, sans-serif; transition: opacity 0.5s;
+    }
+    #loading.done { opacity: 0; pointer-events: none; }
+    .spinner {
+      width: 36px; height: 36px; border: 4px solid rgba(255,255,255,0.2);
+      border-top-color: #34d399; border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <div class="spinner"></div>
+    <p style="margin-top:16px;font-size:14px;opacity:0.7">VERDIS-PCF 로딩 중...</p>
+  </div>
+  <iframe id="app" allowfullscreen allow="clipboard-read; clipboard-write"></iframe>
+  <script>
+    // Deployment ID. Apps Script actually serves the SAME deployment under
+    // two URL shapes depending on the viewer's Google account:
+    //   - public:           https://script.google.com/macros/s/<ID>/exec
+    //   - workspace-domain: https://script.google.com/a/<domain>/macros/s/<ID>/exec
+    // ScriptApp.getService().getUrl() returns whichever the current viewer
+    // resolved to, so we accept either form by matching only the deploy ID.
+    var DEPLOY_ID = 'AKfycbwd4K6sUo7Q3BZULEUmphJsGNstKPTKk9EzoH318ocMe82vPbwF9IUMMvSHzZrI2FQJ';
+    var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/' + DEPLOY_ID + '/exec';
+    var iframe = document.getElementById('app');
+    var loading = document.getElementById('loading');
 
+    // ?embed=1 makes the Apps Script templates render with <base target="_self">
+    // so internal navigation stays inside this iframe — the address bar
+    // remains verdis.co.kr/pcf/ throughout the user's session.
+    iframe.src = APPS_SCRIPT_URL + '?page=home&embed=1';
+
+    function showLoading() {
+      if (!loading) return;
+      loading.style.display = '';
+      loading.classList.remove('done');
+    }
+    function hideLoading() {
+      if (!loading) return;
+      loading.classList.add('done');
+      setTimeout(function () { loading.style.display = 'none'; }, 600);
+    }
+    iframe.addEventListener('load', hideLoading);
+
+    /**
+     * Internal navigation inside the iframe asks us (the wrapper) to
+     * update iframe.src, because doing window.location.href on the
+     * innermost googleusercontent.com frame produces a blank-page
+     * cross-origin redirect chain. Posting from the iframe and
+     * reloading the entire chain from here renders cleanly every time.
+     */
+    window.addEventListener('message', function (e) {
+      var d = e && e.data;
+      if (!d || d.type !== 'pcf-nav' || typeof d.url !== 'string') return;
+      // Accept either URL shape: must be script.google.com AND carry
+      // our deployment ID. (Strict prefix-match would reject the
+      // /a/<workspace-domain>/ form Google serves to logged-in users.)
+      if (!/^https:\/\/script\.google\.com\//.test(d.url)) return;
+      if (d.url.indexOf(DEPLOY_ID) < 0) return;
+      showLoading();
+      iframe.src = d.url;
+    });
+  </script>
+</body>
+</html>

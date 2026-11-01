@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>VERDIS Platform</title>
   <style>
     body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;
@@ -20,6 +21,19 @@
       border:none;
       z-index:9999;
     }
+
+    #fallback{display:none;margin-top:20px;font-size:14px}
+    #fallback a{
+      display:inline-block;
+      margin-top:12px;
+      padding:14px 28px;
+      border-radius:10px;
+      background:#22d3ee;
+      color:#0f172a;
+      font-size:16px;
+      font-weight:700;
+      text-decoration:none;
+    }
   </style>
 </head>
 <body>
@@ -29,6 +43,11 @@
     <div class="spinner"></div>
     <h2>🌿 VERDIS Platform</h2>
     <p>플랫폼에 접속 중입니다...</p>
+    <!-- iframe이 뜨지 않을 때 직접 접속 (Safari 쿠키 차단 등) -->
+    <div id="fallback">
+      <div>화면이 열리지 않으면 아래 버튼을 눌러 주세요.</div>
+      <a id="fallback-link">포털 바로 열기</a>
+    </div>
   </div>
 
   <!-- iframe -->
@@ -41,7 +60,11 @@
 
   <script>
     var frame = document.getElementById('app-frame');
+    var fallback = document.getElementById('fallback');
+    document.getElementById('fallback-link').href = frame.src;
+    var fallbackTimer = setTimeout(function(){ fallback.style.display = 'block'; }, 8000);
     frame.addEventListener('load', function(){
+      clearTimeout(fallbackTimer);
       document.getElementById('loading-card').style.display = 'none';
       frame.style.display = 'block';
     });
